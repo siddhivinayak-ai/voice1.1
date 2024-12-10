@@ -91,6 +91,10 @@
 
       // Function to speak the response
       function speak(text) {
+        if (synth.speaking) {
+          console.error("Speech synthesis already speaking...");
+          return;
+        }
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.pitch = 1.2;  // Slightly higher pitch for friendly tone
         utterance.rate = 1;  // Normal speaking rate
