@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 20px;
+      color: #333;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      display: inline-block;
+    }
+    #mic-container {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #mic-container:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Voice Assistant</h1>
+  <div id="response">I'm listening... What can I do for you?</div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const responseBox = document.getElementById("response");
+
+      // Web Speech API setup
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;  // Keep listening continuously
+      recognition.lang = "en-US";
+
+      // Speech synthesis setup
+      const synth = window.speechSynthesis;
+
+      // Commands and responses
+      const commands = {
+        "open google": () => {
+          window.open("https://www.google.com", "_blank");
+          return "Opening Google, enjoy your search!";
+        },
+        "play a video": () => {
+          window.open("https://www.youtube.com", "_blank");
+          return "Opening YouTube, enjoy watching!";
+        },
+        "what is the time": () => `The time is ${new Date().toLocaleTimeString()}.`,
+        "who are you": () => "I'm Kranti, your personal assistant. How can I help you today?",
+        hello: () => "Hi there! How can I assist you?",
+        "tell me a joke": () => "Why don't skeletons fight each other? They don't have the guts! Haha!",
+        "thank you": () => "You're welcome! Always happy to help.",
+        "bye": () => "Goodbye! See you next time!"
+      };
+
+      // Start listening when page loads
+      recognition.start();
+
+      // Handle speech recognition results
+      recognition.onresult = (event) => {
+        const transcript = event.results[event.resultIndex][0].transcript.trim().toLowerCase();
+        console.log(`Heard: ${transcript}`);
+        
+        let response = "I didn't understand that.";
+        for (const [key, value] of Object.entries(commands)) {
+          if (transcript.includes(key)) {
+            response = value();
+            break;
+          }
+        }
+
+        // Display and speak the response
+        responseBox.textContent = response;
+        speak(response);
+      };
+
+      // Function to speak the response
+      function speak(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.pitch = 1.2;  // Slightly higher pitch for friendly tone
+        utterance.rate = 1;  // Normal speaking rate
+        synth.speak(utterance);
+      }
+
+      // Handle errors
+      recognition.onerror = (event) => {
+        responseBox.textContent = `Error: ${event.error}`;
+      };
+    });
+  </script>
+
+</body>
+</html>
